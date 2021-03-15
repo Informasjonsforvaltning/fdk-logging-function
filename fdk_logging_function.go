@@ -16,14 +16,15 @@ type LogEntry struct {
 }
 
 func (e LogEntry) String() string {
-	if e.Severity == "" {
-		e.Severity = "INFO"
-	}
 	out, err := json.Marshal(e)
 	if err != nil {
 		log.Printf("json.Marshal: %v", err)
 	}
 	return string(out)
+}
+
+func isInvalid(e LogEntry) bool {
+	return e.Environment == "" || e.History == "" || e.Message == "" || e.Severity == "" || e.Trace == ""
 }
 
 func Logging(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +46,7 @@ func Logging(w http.ResponseWriter, r *http.Request) {
 func logger(w http.ResponseWriter, r *http.Request) {
 	var logEntry LogEntry
 
-	if err := json.NewDecoder(r.Body).Decode(&logEntry); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&logEntry); err != nil || isInvalid(logEntry) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Failed to parse log message.")
 		return
