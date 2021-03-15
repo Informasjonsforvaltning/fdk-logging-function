@@ -11,8 +11,8 @@ type LogEntry struct {
 	Message     string `json:"message"`
 	Severity    string `json:"severity"`
 	Trace       string `json:"trace"`
-	History     string `json:"history"`
 	Environment string `json:"environment"`
+	Name        string `json:"name"`
 }
 
 func (e LogEntry) String() string {
@@ -24,7 +24,7 @@ func (e LogEntry) String() string {
 }
 
 func isInvalid(e LogEntry) bool {
-	return e.Environment == "" || e.History == "" || e.Message == "" || e.Severity == "" || e.Trace == ""
+	return e.Message == "" || e.Severity == ""
 }
 
 func Logging(w http.ResponseWriter, r *http.Request) {
