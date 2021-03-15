@@ -46,6 +46,7 @@ func logger(w http.ResponseWriter, r *http.Request) {
 	var logEntry LogEntry
 
 	if err := json.NewDecoder(r.Body).Decode(&logEntry); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Failed to parse log message.")
 		return
 	}
