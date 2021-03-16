@@ -10,9 +10,12 @@ import (
 type LogEntry struct {
 	Message     string `json:"message"`
 	Severity    string `json:"severity"`
+	Namespace   string `json:"namespace"`
 	Trace       string `json:"trace"`
-	Environment string `json:"environment"`
 	Name        string `json:"name"`
+	Location    string `json:"location"`
+	Application string `json:"application"`
+	Image       string `json:"image"`
 }
 
 func (e LogEntry) String() string {
@@ -24,15 +27,15 @@ func (e LogEntry) String() string {
 }
 
 func isInvalid(e LogEntry) bool {
-	return e.Message == "" || e.Severity == ""
+	return e.Message == "" || e.Severity == "" || e.Application == "" || e.Image == ""
 }
 
 func Logging(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
 	case http.MethodPost:
 		logger(w, r)
 	case http.MethodOptions:
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Header().Set("Access-Control-Max-Age", "3600")
