@@ -8,33 +8,17 @@ on:
 jobs:
   deploy:
     name: Deploy on merge to main branch
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Deploy
-        uses: google-github-actions/deploy-cloud-functions@main
-        with:
-          name: cloud-logging
-          runtime: go121
-          go-version: 1.21.4
-          entry_point: Logging
-          memory_mb: 256
-          region: europe-west1
-          max_instances: 1
-          credentials: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_KEY }}
-          service_account_email: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_EMAIL }}
-
-      - name: Notify slack
-        uses: 8398a7/action-slack@v3
-        with:
-          mention: 'channel'
-          if_mention: failure
-          status: ${{ job.status }}
-          author_name: 'Application: fdk-logging-function'
-          fields: commit,author,workflow,message
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always()
+    uses: Informasjonsforvaltning/workflows/.github/workflows/deploy-cloud-function.yaml@main
+    with:
+      app_name: cloud-logging
+      entry_point: Logging
+      environment: prod
+      go-version: 1.21.4
+      max_instances: 1
+      memory: 256
+      region: europe-west1
+      runtime: go121
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DIGDIR_CLOUD_FUNCTIONS_SA_KEY: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
