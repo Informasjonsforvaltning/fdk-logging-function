@@ -1,3 +1,3 @@
 module github.com/Informasjonsforvaltning/fdk-logging-function
 
-go 1.16
+go 1.21
