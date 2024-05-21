@@ -6,12 +6,12 @@ on:
       - main
 
 jobs:
-  deploy:
+  deploy-error-logging-prod:
     name: Deploy on merge to main branch
     uses: Informasjonsforvaltning/workflows/.github/workflows/deploy-cloud-function.yaml@main
     with:
       app_name: cloud-logging
-      entry_point: Logging
+      entry_point: ErrorLogging
       environment: prod
       go-version: 1.21.4
       max_instances: 1
