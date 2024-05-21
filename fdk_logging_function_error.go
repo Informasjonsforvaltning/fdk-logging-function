@@ -5,9 +5,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 )
 
-type LogEntry struct {
+func init() {
+    functions.HTTP("ErrorLogging", errorLogging)
+}
+
+type ErrorLogEntry struct {
 	Message     string `json:"message"`
 	Severity    string `json:"severity"`
 	Namespace   string `json:"namespace"`
@@ -18,7 +24,7 @@ type LogEntry struct {
 	Image       string `json:"image"`
 }
 
-func (e LogEntry) String() string {
+func (e ErrorLogEntry) String() string {
 	out, err := json.Marshal(e)
 	if err != nil {
 		log.Printf("json.Marshal: %v", err)
@@ -26,15 +32,15 @@ func (e LogEntry) String() string {
 	return string(out)
 }
 
-func isInvalid(e LogEntry) bool {
+func isInvalidErrorLogEntry(e ErrorLogEntry) bool {
 	return e.Message == "" || e.Severity == "" || e.Application == "" || e.Image == ""
 }
 
-func Logging(w http.ResponseWriter, r *http.Request) {
+func errorLogging(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
 	case http.MethodPost:
-		logger(w, r)
+		errorLogger(w, r)
 	case http.MethodOptions:
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -46,15 +52,15 @@ func Logging(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logger(w http.ResponseWriter, r *http.Request) {
-	var logEntry LogEntry
+func errorLogger(w http.ResponseWriter, r *http.Request) {
+	var errorLogEntry ErrorLogEntry
 
-	if err := json.NewDecoder(r.Body).Decode(&logEntry); err != nil || isInvalid(logEntry) {
+	if err := json.NewDecoder(r.Body).Decode(&errorLogEntry); err != nil || isInvalidErrorLogEntry(errorLogEntry) {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Failed to parse log message.")
+		fmt.Fprint(w, "Failed to parse error log message.")
 		return
 	}
 
-	fmt.Println(logEntry)
-	fmt.Fprintf(w, "Logged message: %s", logEntry)
+	fmt.Println(errorLogEntry)
+	fmt.Fprintf(w, "Logged error message: %s", errorLogEntry)
 }

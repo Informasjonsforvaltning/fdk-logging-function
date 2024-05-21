@@ -1,0 +1,42 @@
+name: Deploy as Google function
+
+on:
+  pull_request:
+    types: [ready_for_review, opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  deploy-error-logging-staging:
+    name: Deploy error-logging on pull request to main branch
+    uses: Informasjonsforvaltning/workflows/.github/workflows/deploy-cloud-function.yaml@main
+    with:
+      app_name: cloud-logging-staging
+      entry_point: ErrorLogging
+      environment: staging
+      go-version: 1.21.4
+      max_instances: 1
+      memory: 256
+      region: europe-west1
+      runtime: go121
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DIGDIR_CLOUD_FUNCTIONS_SA_KEY: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy-csp-logging-staging:
+    name: Deploy csp-logging on pull request to main branch
+    uses: Informasjonsforvaltning/workflows/.github/workflows/deploy-cloud-function.yaml@main
+    with:
+      app_name: cloud-logging-csp-staging
+      entry_point: CspLogging
+      environment: staging
+      go-version: 1.21.4
+      max_instances: 1
+      memory: 256
+      region: europe-west1
+      runtime: go121
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DIGDIR_CLOUD_FUNCTIONS_SA_KEY: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
