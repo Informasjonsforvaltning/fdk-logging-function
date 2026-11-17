@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-    functions.HTTP("ErrorLogging", errorLogging)
+	functions.HTTP("ErrorLogging", errorLogging)
 }
 
 type ErrorLogEntry struct {

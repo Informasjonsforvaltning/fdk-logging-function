@@ -1,0 +1,26 @@
+name: Deploy dev-function
+
+on:
+  pull_request:
+    types: [ready_for_review, opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  deploy-dev:
+    name: Deploy to dev on pull request to main branch
+    uses: Informasjonsforvaltning/workflows/.github/workflows/deploy-cloud-function.yaml@main
+    with:
+      app_name: cloud-logging-dev
+      entry_point: ErrorLogging
+      environment: dev
+      go-version: "1.26"
+      go-test-cmd: "-v ./..."
+      max_instances: 1
+      memory: 256
+      region: europe-west1
+      runtime: go126
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DIGDIR_CLOUD_FUNCTIONS_SA_KEY: ${{ secrets.DIGDIR_CLOUD_FUNCTIONS_SA_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
