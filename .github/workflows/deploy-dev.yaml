@@ -18,7 +18,7 @@ jobs:
       go-test-cmd: "-v ./..."
       max_instances: 1
       memory: 256
-      region: europe-west1
+      region: europe-north1
       runtime: go126
     secrets:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

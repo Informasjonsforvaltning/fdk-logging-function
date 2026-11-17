@@ -22,7 +22,7 @@ go test -run 'TestHandlers/error_valid' ./...   # single subtest
 `fdk_logging_function_error.go` registers the entry point `ErrorLogging` in `init()` through `functions.HTTP(...)`. The handler:
 - sets `Access-Control-Allow-Origin: *` on every response. `OPTIONS` returns 204 with CORS preflight headers, `POST` is handled, and any other method gets 405.
 - decodes an `ErrorLogEntry` and returns 400 unless `message`, `severity`, `application` and `image` are set.
-- logs the entry with `fmt.Println`, which calls its `String()` method (JSON marshal). The JSON line on stdout is the log record, so struct field names and JSON tags decide the shape of the Cloud Logging entry. `severity` is interpreted by Cloud Logging, and `namespace` (prod/staging/demo) is what the log-based metrics and alert policies in GCP project `digdir-cloud-functions` filter on.
+- logs the entry with `fmt.Println`, which calls its `String()` method (JSON marshal). The JSON line on stdout is the log record, so struct field names and JSON tags decide the shape of the Cloud Logging entry. `severity` is interpreted by Cloud Logging, and `namespace` (prod/staging/demo/development) identifies the calling environment.
 
 ## Deployment
 
@@ -30,6 +30,6 @@ GitHub Actions calls the shared reusable workflow `Informasjonsforvaltning/workf
 - **Dev** (`deploy-dev.yaml`): runs on PRs to `main` and deploys `cloud-logging-dev`, meant for fdk-portal's staging, demo and local development.
 - **Prod** (`deploy-prod.yaml`): runs on push to `main` and deploys `cloud-logging`, meant for fdk-portal prod only.
 
-The function URL is `https://europe-west1-digdir-cloud-functions.cloudfunctions.net/<name>`. fdk-portal reads it from the `FDK_LOGGING_FUNCTION_URI` key in the Kubernetes secret `commonurl`, with a fallback in `src/env.ts` for local development. New 2nd gen functions are private by default, so a newly created function needs `allUsers` granted the invoker role once. Later deploys keep that setting.
+The function URL is `https://europe-north1-digdir-cloud-functions.cloudfunctions.net/<name>`. fdk-portal reads it from the `FDK_LOGGING_FUNCTION_URI` key in the Kubernetes secret `commonurl`, with a fallback in `src/env.ts` for local development. New 2nd gen functions are private by default, so a newly created function needs `allUsers` granted the invoker role once. Later deploys keep that setting.
 
-Both run in `digdir-cloud-functions`, region `europe-west1`. The Go version is set in `go.mod` and in each workflow (`go-version`, `runtime`). Update all of them together.
+Both run in `digdir-cloud-functions`, region `europe-north1`. The Go version is set in `go.mod` and in each workflow (`go-version`, `runtime`). Update all of them together.
