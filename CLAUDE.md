@@ -21,7 +21,7 @@ go test -run 'TestHandlers/error_valid' ./...   # single subtest
 
 `fdk_logging_function_error.go` registers the entry point `ErrorLogging` in `init()` through `functions.HTTP(...)`. The handler:
 - sets `Access-Control-Allow-Origin: *` on every response. `OPTIONS` returns 204 with CORS preflight headers, `POST` is handled, and any other method gets 405.
-- decodes an `ErrorLogEntry` and returns 400 unless `message`, `severity`, `application` and `image` are set.
+- decodes an `ErrorLogEntry` from a body capped at 64 KB (`maxBodyBytes`) and returns 400 unless `message`, `severity`, `application` and `image` are set. On success it returns 204 without echoing the input. The function is publicly invokable (`allUsers`) because it is called from browsers, so keep it write-only and cheap to abuse.
 - logs the entry with `fmt.Println`, which calls its `String()` method (JSON marshal). The JSON line on stdout is the log record, so struct field names and JSON tags decide the shape of the Cloud Logging entry. `severity` is interpreted by Cloud Logging, and `namespace` (prod/staging/demo/development) identifies the calling environment.
 
 ## Deployment

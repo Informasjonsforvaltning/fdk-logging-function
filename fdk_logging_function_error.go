@@ -52,15 +52,19 @@ func errorLogging(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// maxBodyBytes caps the request body, leaving ample room for a stack trace.
+const maxBodyBytes = 64 << 10
+
 func errorLogger(w http.ResponseWriter, r *http.Request) {
 	var errorLogEntry ErrorLogEntry
 
-	if err := json.NewDecoder(r.Body).Decode(&errorLogEntry); err != nil || isInvalidErrorLogEntry(errorLogEntry) {
+	body := http.MaxBytesReader(w, r.Body, maxBodyBytes)
+	if err := json.NewDecoder(body).Decode(&errorLogEntry); err != nil || isInvalidErrorLogEntry(errorLogEntry) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Failed to parse error log message.")
 		return
 	}
 
 	fmt.Println(errorLogEntry)
-	fmt.Fprintf(w, "Logged error message: %s", errorLogEntry)
+	w.WriteHeader(http.StatusNoContent)
 }

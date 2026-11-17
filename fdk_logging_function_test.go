@@ -9,6 +9,7 @@ import (
 
 func TestHandlers(t *testing.T) {
 	const validError = `{"message":"m","severity":"ERROR","application":"a","image":"i"}`
+	tooLarge := `{"message":"` + strings.Repeat("x", maxBodyBytes) + `","severity":"ERROR","application":"a","image":"i"}`
 
 	tests := []struct {
 		name    string
@@ -19,9 +20,10 @@ func TestHandlers(t *testing.T) {
 	}{
 		{"error preflight", errorLogging, http.MethodOptions, "", http.StatusNoContent},
 		{"error wrong method", errorLogging, http.MethodGet, "", http.StatusMethodNotAllowed},
-		{"error valid", errorLogging, http.MethodPost, validError, http.StatusOK},
+		{"error valid", errorLogging, http.MethodPost, validError, http.StatusNoContent},
 		{"error missing field", errorLogging, http.MethodPost, `{"message":"m"}`, http.StatusBadRequest},
 		{"error bad json", errorLogging, http.MethodPost, `{`, http.StatusBadRequest},
+		{"error body too large", errorLogging, http.MethodPost, tooLarge, http.StatusBadRequest},
 	}
 
 	for _, tt := range tests {
