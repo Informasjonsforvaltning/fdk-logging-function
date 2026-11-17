@@ -1,4 +1,6 @@
 name: Deploy dev-function
+permissions:
+  contents: read
 
 on:
   pull_request:

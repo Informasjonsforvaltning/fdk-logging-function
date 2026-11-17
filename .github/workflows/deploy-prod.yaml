@@ -1,4 +1,6 @@
 name: Deploy prod-function
+permissions:
+  contents: read
 
 on:
   push:
